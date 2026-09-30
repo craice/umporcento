@@ -1,0 +1,25 @@
+# Dependências e build
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Cache do pipeline (microdados baixados do IBGE)
+pipeline/cache/
+
+# Ambiente e sistema
+.env
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Processo de desenvolvimento com IA (Superpowers / Claude) — fica só local
+.superpowers/
+docs/superpowers/
+.claude/
+CLAUDE.md
+CLAUDE.local.md
