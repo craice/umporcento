@@ -12,7 +12,7 @@
 }
 @keyframes sheet-up { from { transform: translateY(100%); } }
 @keyframes sheet-left { from { transform: translateX(100%); } }
-.sheet__close { position: absolute; top: 10px; right: 12px; border: 0; background: var(--white); border-radius: 50%; width: 40px; height: 40px; font-size: 26px; line-height: 1; box-shadow: var(--shadow-tag); }
+.sheet__close { position: absolute; top: 10px; right: 12px; border: 0; background: var(--white); border-radius: 50%; width: 40px; height: 40px; font: 400 26px/1 system-ui, sans-serif; box-shadow: var(--shadow-tag); }
 .sheet__eyebrow { text-transform: uppercase; letter-spacing: 0.06em; font-size: 16px; margin: 0 48px 6px 0; }
 .sheet__title { font-weight: 400; font-size: 26px; line-height: 1.1; margin: 0 0 14px; }
 .sheet__title b { color: var(--red); font-weight: 900; }

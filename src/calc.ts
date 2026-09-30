@@ -79,11 +79,13 @@ export function densityCurve(
     const mass = percentileRank(z, levels, values) - percentileRank(a, levels, values)
     raw.push({ x: Math.exp(lo + (b + 0.5) * step), y: Math.max(0, mass) })
   }
-  const smooth = raw.map((p, i) => {
-    const prev = raw[i - 1]?.y ?? p.y
-    const next = raw[i + 1]?.y ?? p.y
-    return { x: p.x, y: (prev + 2 * p.y + next) / 4 }
-  })
+  const blur = (pts: { x: number; y: number }[]) =>
+    pts.map((p, i) => {
+      const prev = pts[i - 1]?.y ?? p.y
+      const next = pts[i + 1]?.y ?? p.y
+      return { x: p.x, y: (prev + 2 * p.y + next) / 4 }
+    })
+  const smooth = blur(blur(blur(raw)))
   const max = Math.max(...smooth.map((p) => p.y)) || 1
   return smooth.map((p) => ({ x: p.x, y: p.y / max }))
 }

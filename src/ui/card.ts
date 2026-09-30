@@ -81,36 +81,36 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
 
   // lead
   ctx.fillStyle = INK
-  ctx.font = `900 120px ${FONT}`
-  let y = 340
+  ctx.font = `900 96px ${FONT}`
+  let y = 300
   for (const line of wrapWords(d.lead.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
     ctx.fillText(line, M, y)
-    y += 112
+    y += 92
   }
 
   // number
   ctx.fillStyle = RED
-  ctx.font = `900 520px ${FONT}`
-  const numY = y + 400
+  ctx.font = `900 440px ${FONT}`
+  const numY = y + 330
   ctx.fillText(d.num, M - 10, numY)
   const nw = ctx.measureText(d.num).width
-  ctx.font = `900 230px ${FONT}`
-  ctx.fillText('%', M - 10 + nw + 10, numY - 220)
+  ctx.font = `900 200px ${FONT}`
+  ctx.fillText('%', M - 10 + nw + 10, numY - 190)
 
   // tail
   ctx.fillStyle = INK
-  ctx.font = `900 88px ${FONT}`
-  y = numY + 110
+  ctx.font = `900 80px ${FONT}`
+  y = numY + 100
   for (const line of wrapWords(d.tail.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
     ctx.fillText(line, M, y)
-    y += 88
+    y += 80
   }
 
   // tags 2x2
   const gap = 28
   const tw = (W - 2 * M - gap) / 2
-  const th = 230
-  y += 40
+  const th = 210
+  y += 30
   d.tags.slice(0, 4).forEach((tag, i) => {
     const x = M + (i % 2) * (tw + gap)
     const ty = y + Math.floor(i / 2) * (th + gap)
@@ -121,33 +121,32 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
     roundRect(ctx, x, ty, tw, th, 18)
     ctx.fill()
     ctx.fillStyle = INK
-    ctx.font = `400 46px ${FONT}`
-    ctx.fillText(tag.label.toUpperCase(), x + 28, ty + 70)
+    ctx.font = `400 44px ${FONT}`
+    ctx.fillText(tag.label.toUpperCase(), x + 28, ty + 66)
     ctx.fillStyle = RED
-    ctx.font = `900 130px ${FONT}`
-    ctx.fillText(tag.value + (tag.imprecise ? '*' : ''), x + 28, ty + 196)
+    ctx.font = `900 120px ${FONT}`
+    ctx.fillText(tag.value + (tag.imprecise ? '*' : ''), x + 28, ty + 182)
   })
-  y += 2 * th + gap + 90
 
-  // profile, income, footnote
+  // bottom block, anchored to the bottom edge so it never collides with the tags
   ctx.fillStyle = INK
-  ctx.font = `400 48px ${FONT}`
-  ctx.fillText(d.profile, M, y)
-  if (d.incomeText) {
-    y += 64
-    ctx.fillText(d.incomeText, M, y)
-  }
-  if (d.tags.some((t) => t.imprecise)) {
-    y += 56
-    ctx.font = `400 36px ${FONT}`
-    ctx.fillText('* estimativa imprecisa (amostra pequena)', M, y)
-  }
-
-  // footer
   ctx.font = `900 56px ${FONT}`
   ctx.fillText(SITE_LABEL, M, H - 130)
   ctx.font = `400 40px ${FONT}`
   ctx.fillText(d.source, M, H - 76)
+
+  let by = H - 230
+  if (d.tags.some((t) => t.imprecise)) {
+    ctx.font = `400 36px ${FONT}`
+    ctx.fillText('* estimativa imprecisa (amostra pequena)', M, by)
+    by -= 60
+  }
+  ctx.font = `400 48px ${FONT}`
+  if (d.incomeText) {
+    ctx.fillText(d.incomeText, M, by)
+    by -= 64
+  }
+  ctx.fillText(d.profile, M, by)
 }
 
 export async function renderCardBlob(data: CardData): Promise<Blob> {
