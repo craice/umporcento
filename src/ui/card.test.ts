@@ -47,13 +47,13 @@ describe('wrapWords', () => {
 })
 
 describe('createCardCache', () => {
-  it('renders once per variant so the share click does not wait for drawing', async () => {
-    const render = vi.fn(async (showIncome: boolean) => new Blob([String(showIncome)]))
+  it('renders once so the share click does not wait for drawing', async () => {
+    const render = vi.fn(async () => new Blob(['card']))
     const cache = createCardCache(render)
-    const a = cache.get(false)
-    expect(cache.get(false)).toBe(a)
-    await cache.get(true)
-    expect(render).toHaveBeenCalledTimes(2)
+    const a = cache.get()
+    expect(cache.get()).toBe(a)
+    await a
+    expect(render).toHaveBeenCalledTimes(1)
   })
   it('retries after a failed render', async () => {
     let calls = 0
@@ -62,8 +62,8 @@ describe('createCardCache', () => {
       if (calls === 1) throw new Error('boom')
       return new Blob(['ok'])
     })
-    await expect(cache.get(false)).rejects.toThrow('boom')
-    await expect(cache.get(false)).resolves.toBeInstanceOf(Blob)
+    await expect(cache.get()).rejects.toThrow('boom')
+    await expect(cache.get()).resolves.toBeInstanceOf(Blob)
   })
 })
 
