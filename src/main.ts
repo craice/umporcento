@@ -1,0 +1,4 @@
+import '@fontsource/londrina-solid/400.css'
+import '@fontsource/londrina-solid/900.css'
+import './styles/tokens.css'
+import './styles/base.css'
