@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createCardCache, shareOrDownload, wrapWords, type ShareEnv } from './card'
+import { createCardCache, fitFontSize, shareOrDownload, wrapWords, type ShareEnv } from './card'
 
 const blob = new Blob(['x'], { type: 'image/png' })
 
@@ -64,5 +64,18 @@ describe('createCardCache', () => {
     })
     await expect(cache.get(false)).rejects.toThrow('boom')
     await expect(cache.get(false)).resolves.toBeInstanceOf(Blob)
+  })
+})
+
+describe('fitFontSize', () => {
+  const measure = (size: number) => size * 3 // text 3x wider than its size
+  it('keeps the max size when the text fits', () => {
+    expect(fitFontSize(measure, 100, 400)).toBe(100)
+  })
+  it('shrinks until the text fits', () => {
+    expect(fitFontSize(measure, 400, 900)).toBe(300)
+  })
+  it('never goes below the minimum', () => {
+    expect(fitFontSize(measure, 400, 30, 40)).toBe(40)
   })
 })

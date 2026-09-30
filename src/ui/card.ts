@@ -24,7 +24,15 @@ const H = 1920
 const PAPER = '#FFE600'
 const RED = '#E8001C'
 const INK = '#141414'
-const FONT = '"Londrina Solid"'
+const DISPLAY = '"Carter One"'
+const TEXT = 'Nunito'
+
+// Largest font size (stepping down by 2px) at which the text fits maxWidth.
+export function fitFontSize(measureAt: (size: number) => number, maxSize: number, maxWidth: number, minSize = 40): number {
+  let size = maxSize
+  while (size > minSize && measureAt(size) > maxWidth) size -= 2
+  return Math.max(size, minSize)
+}
 
 export function wrapWords(text: string, measure: (s: string) => number, maxWidth: number): string[] {
   const lines: string[] = []
@@ -61,6 +69,10 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 
 function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
   const M = 80
+  const measureAt = (font: (size: number) => string, text: string) => (size: number) => {
+    ctx.font = font(size)
+    return ctx.measureText(text).width
+  }
   ctx.fillStyle = PAPER
   ctx.fillRect(0, 0, W, H)
   grain(ctx)
@@ -68,49 +80,57 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
 
   // top row
   ctx.fillStyle = INK
-  ctx.font = `400 48px ${FONT}`
+  ctx.font = `800 44px ${TEXT}`
   ctx.fillText('UMPORCENTO', M, 140)
-  ctx.font = `900 44px ${FONT}`
+  ctx.font = `800 40px ${TEXT}`
   const stamp = 'PNAD · IBGE'
   const sw = ctx.measureText(stamp).width + 40
   ctx.fillStyle = RED
   roundRect(ctx, W - M - sw, 92, sw, 66, 8)
   ctx.fill()
   ctx.fillStyle = '#FFFFFF'
-  ctx.fillText(stamp, W - M - sw + 20, 142)
+  ctx.fillText(stamp, W - M - sw + 20, 140)
 
   // lead
   ctx.fillStyle = INK
-  ctx.font = `900 96px ${FONT}`
+  ctx.font = `400 88px ${DISPLAY}`
   let y = 300
-  for (const line of wrapWords(d.lead.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
+  for (const line of wrapWords(d.lead, (s) => ctx.measureText(s).width, W - 2 * M)) {
     ctx.fillText(line, M, y)
-    y += 92
+    y += 100
   }
 
-  // number
+  // number + "%" sized to fit the width
+  const pctRatio = 0.45
+  const numSize = fitFontSize(
+    (size) => measureAt((s) => `400 ${s}px ${DISPLAY}`, d.num)(size) + measureAt((s) => `400 ${s * pctRatio}px ${DISPLAY}`, '%')(size) + 20,
+    400,
+    W - 2 * M,
+    160,
+  )
   ctx.fillStyle = RED
-  ctx.font = `900 440px ${FONT}`
-  const numY = y + 330
-  ctx.fillText(d.num, M - 10, numY)
+  ctx.font = `400 ${numSize}px ${DISPLAY}`
+  const numY = y + numSize * 0.8
+  ctx.fillText(d.num, M, numY)
   const nw = ctx.measureText(d.num).width
-  ctx.font = `900 200px ${FONT}`
-  ctx.fillText('%', M - 10 + nw + 10, numY - 190)
+  ctx.font = `400 ${numSize * pctRatio}px ${DISPLAY}`
+  ctx.fillText('%', M + nw + 20, numY - numSize * 0.4)
 
   // tail
   ctx.fillStyle = INK
-  ctx.font = `900 80px ${FONT}`
-  y = numY + 100
-  for (const line of wrapWords(d.tail.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
+  ctx.font = `400 72px ${DISPLAY}`
+  // Carter One uses old-style figures: 9 and the comma descend below the baseline
+  y = numY + numSize * 0.3 + 80
+  for (const line of wrapWords(d.tail, (s) => ctx.measureText(s).width, W - 2 * M)) {
     ctx.fillText(line, M, y)
-    y += 80
+    y += 84
   }
 
   // tags 2x2
   const gap = 28
   const tw = (W - 2 * M - gap) / 2
   const th = 210
-  y += 30
+  y += 20
   d.tags.slice(0, 4).forEach((tag, i) => {
     const x = M + (i % 2) * (tw + gap)
     const ty = y + Math.floor(i / 2) * (th + gap)
@@ -121,27 +141,29 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
     roundRect(ctx, x, ty, tw, th, 18)
     ctx.fill()
     ctx.fillStyle = INK
-    ctx.font = `400 44px ${FONT}`
-    ctx.fillText(tag.label.toUpperCase(), x + 28, ty + 66)
+    const label = tag.label.toUpperCase()
+    ctx.font = `800 ${fitFontSize(measureAt((s) => `800 ${s}px ${TEXT}`, label), 40, tw - 56, 26)}px ${TEXT}`
+    ctx.fillText(label, x + 28, ty + 66)
     ctx.fillStyle = RED
-    ctx.font = `900 120px ${FONT}`
-    ctx.fillText(tag.value + (tag.imprecise ? '*' : ''), x + 28, ty + 182)
+    const value = tag.value + (tag.imprecise ? '*' : '')
+    ctx.font = `400 ${fitFontSize(measureAt((s) => `400 ${s}px ${DISPLAY}`, value), 110, tw - 56, 60)}px ${DISPLAY}`
+    ctx.fillText(value, x + 28, ty + 176)
   })
 
   // bottom block, anchored to the bottom edge so it never collides with the tags
   ctx.fillStyle = INK
-  ctx.font = `900 56px ${FONT}`
+  ctx.font = `400 52px ${DISPLAY}`
   ctx.fillText(SITE_LABEL, M, H - 130)
-  ctx.font = `400 40px ${FONT}`
+  ctx.font = `700 38px ${TEXT}`
   ctx.fillText(d.source, M, H - 76)
 
   let by = H - 230
   if (d.tags.some((t) => t.imprecise)) {
-    ctx.font = `400 36px ${FONT}`
+    ctx.font = `700 34px ${TEXT}`
     ctx.fillText('* estimativa imprecisa (amostra pequena)', M, by)
     by -= 60
   }
-  ctx.font = `400 48px ${FONT}`
+  ctx.font = `700 44px ${TEXT}`
   if (d.incomeText) {
     ctx.fillText(d.incomeText, M, by)
     by -= 64
@@ -150,7 +172,11 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
 }
 
 export async function renderCardBlob(data: CardData): Promise<Blob> {
-  await Promise.all([document.fonts.load(`400 48px ${FONT}`), document.fonts.load(`900 120px ${FONT}`)])
+  await Promise.all([
+    document.fonts.load(`400 100px ${DISPLAY}`),
+    document.fonts.load(`700 40px ${TEXT}`),
+    document.fonts.load(`800 40px ${TEXT}`),
+  ])
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H

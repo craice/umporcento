@@ -1,4 +1,4 @@
-"""Generates the static Open Graph image (1200x630) using Londrina Solid."""
+"""Generates the static Open Graph image (1200x630) using Carter One and Nunito."""
 
 import io
 from pathlib import Path
@@ -6,25 +6,39 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-FONT_URL = "https://github.com/google/fonts/raw/main/ofl/londrinasolid/LondrinaSolid-{weight}.ttf"
+DISPLAY_URL = "https://github.com/google/fonts/raw/main/ofl/carterone/CarterOne.ttf"
+TEXT_URL = "https://github.com/google/fonts/raw/main/ofl/nunito/Nunito%5Bwght%5D.ttf"
 PAPER, RED, INK = "#FFE600", "#E8001C", "#141414"
 
 
-def font(weight: str, size: int) -> ImageFont.FreeTypeFont:
-    data = requests.get(FONT_URL.format(weight=weight), timeout=60).content
-    return ImageFont.truetype(io.BytesIO(data), size)
+def _download(url: str) -> bytes:
+    response = requests.get(url, timeout=60)
+    response.raise_for_status()
+    return response.content
+
+
+def display(size: int) -> ImageFont.FreeTypeFont:
+    return ImageFont.truetype(io.BytesIO(_download(DISPLAY_URL)), size)
+
+
+def text(size: int, weight: int = 700) -> ImageFont.FreeTypeFont:
+    font = ImageFont.truetype(io.BytesIO(_download(TEXT_URL)), size)
+    font.set_variation_by_axes([weight])
+    return font
 
 
 def main(out: Path = Path("public/og.png")) -> None:
     img = Image.new("RGB", (1200, 630), PAPER)
     d = ImageDraw.Draw(img)
-    d.text((70, 60), "UMPORCENTO", font=font("Regular", 44), fill=INK)
-    d.rounded_rectangle((900, 52, 1130, 112), radius=6, fill=RED)
-    d.text((922, 58), "PNAD · IBGE", font=font("Black", 40), fill="#FFFFFF")
-    d.text((70, 150), "ONDE VOCÊ ESTÁ", font=font("Black", 120), fill=INK)
-    d.text((70, 270), "NA RENDA DO BRASIL?", font=font("Black", 120), fill=RED)
-    d.text((70, 440), "Compare sua renda com a de quem trabalha no país.", font=font("Regular", 44), fill=INK)
-    d.text((70, 500), "Dados do IBGE. Nada sai do seu navegador.", font=font("Regular", 44), fill=INK)
+    d.text((70, 66), "UMPORCENTO", font=text(34, 800), fill=INK)
+    stamp_font = text(32, 800)
+    stamp_width = d.textlength("PNAD · IBGE", font=stamp_font)
+    d.rounded_rectangle((1130 - stamp_width - 40, 56, 1130, 110), radius=6, fill=RED)
+    d.text((1130 - stamp_width - 20, 64), "PNAD · IBGE", font=stamp_font, fill="#FFFFFF")
+    d.text((70, 150), "Onde você está", font=display(104), fill=INK)
+    d.text((70, 272), "na renda do Brasil?", font=display(104), fill=RED)
+    d.text((70, 450), "Compare sua renda com a de quem trabalha no país.", font=text(38), fill=INK)
+    d.text((70, 504), "Dados do IBGE. Nada sai do seu navegador.", font=text(38), fill=INK)
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, optimize=True)
     print(f"Wrote {out}")

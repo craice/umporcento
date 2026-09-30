@@ -34,3 +34,15 @@ describe('curveGeometry', () => {
     g.ticks.forEach((t) => expect(t.x).toBeGreaterThanOrEqual(0))
   })
 })
+
+describe('curve ticks spacing', () => {
+  it('drops a tick that would overlap the previous one', () => {
+    const wide = [
+      { x: 400, y: 0.2 },
+      { x: 3000, y: 1 },
+      { x: 100000, y: 0.1 },
+    ]
+    const labels = curveGeometry(wide, 3000, 3000, 320, 100).ticks.map((t) => t.label)
+    expect(labels).toEqual(['R$ 500', 'R$ 3 mil', 'R$ 10 mil', 'R$ 30 mil', 'R$ 100 mil'])
+  })
+})

@@ -51,7 +51,7 @@ export function renderResult(
     <div class="poster__top"><span>sua posição</span><b class="stamp">PNAD ${meta.year}</b></div>
     <button type="button" class="hero" data-scope="br" aria-label="${h.lead} ${h.num}% do Brasil que trabalha. Ver detalhes">
       <span class="hero__lead">${h.lead}</span>
-      <span class="hero__num">${h.num}<span class="hero__pct">%</span></span>
+      <span class="hero__num${h.num.length > 2 ? ' hero__num--long' : ''}">${h.num}<span class="hero__pct">%</span></span>
       <span class="hero__tail">do Brasil que trabalha</span>
     </button>
     <div class="tags">${results.slice(1).map(tagHtml).join('')}</div>
