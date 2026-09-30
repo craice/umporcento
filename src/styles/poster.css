@@ -1,0 +1,49 @@
+.poster {
+  position: relative;
+  background: var(--paper);
+  padding: 22px 18px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  background: var(--grain);
+}
+.poster > * { position: relative; z-index: 1; }
+.poster + .poster { margin-top: 24px; }
+
+.poster__top { display: flex; justify-content: space-between; align-items: center; font-size: 16px; letter-spacing: 0.06em; text-transform: uppercase; }
+.stamp { background: var(--red); color: var(--white); padding: 2px 8px; border-radius: 3px; font-weight: 900; }
+.poster__title { font-weight: 900; font-size: clamp(34px, 9vw, 44px); line-height: 0.95; text-transform: uppercase; margin: 18px 0 20px; }
+
+.field { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+.field__label { display: block; font-size: 18px; text-transform: uppercase; margin-bottom: 6px; padding: 0; }
+.field__help { font-size: 15px; margin: 6px 0 0; opacity: 0.8; }
+.field__error { color: var(--red); font-weight: 900; font-size: 16px; margin: 4px 0 0; min-height: 0; }
+.field__error:empty { display: none; }
+
+.money { display: flex; align-items: baseline; background: var(--white); border-radius: 6px; box-shadow: var(--shadow-tag); padding: 4px 12px; }
+.money__prefix { font-weight: 900; font-size: 28px; color: var(--red); margin-right: 8px; }
+.money input { border: 0; background: transparent; font-weight: 900; font-size: 40px; width: 100%; min-width: 0; padding: 0; outline: none; }
+.money:focus-within { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+select { width: 100%; background: var(--white); border: 0; border-radius: 6px; box-shadow: var(--shadow-tag); padding: 12px; font-size: 20px; appearance: none; }
+.field--invalid select, .field--invalid .money { box-shadow: 0 0 0 3px var(--red); }
+
+.period, .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip span { display: inline-block; background: var(--white); border-radius: 30px; padding: 8px 14px; font-size: 18px; box-shadow: var(--shadow-tag); }
+.chip input:checked + span { background: var(--ink); color: var(--paper); }
+.chip input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.btn { border: 0; border-radius: 6px; padding: 12px 18px; font-size: 20px; background: var(--white); box-shadow: var(--shadow-tag); text-transform: uppercase; }
+.btn--primary { background: var(--red); color: var(--white); font-weight: 900; }
+.btn--block { width: 100%; font-size: 26px; padding: 14px; }
+.btn:active { transform: translate(1px, 2px); box-shadow: none; }
