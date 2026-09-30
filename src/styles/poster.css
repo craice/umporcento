@@ -70,8 +70,6 @@ select { width: 100%; background: var(--white); border: 0; border-radius: 6px; b
 
 .result__hint { font-size: 15px; margin: 10px 0 18px; opacity: 0.8; }
 .actions { display: grid; gap: 10px; }
-.toggle { display: flex; gap: 8px; align-items: center; font-size: 16px; font-weight: 700; }
-.toggle input { width: 20px; height: 20px; accent-color: var(--red); }
 .share-status { margin: 0; font-size: 16px; min-height: 0; }
 .share-status:empty { display: none; }
 .linkish { border: 0; background: none; padding: 0; text-decoration: underline; font-weight: 800; }

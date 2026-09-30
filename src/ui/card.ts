@@ -6,7 +6,6 @@ export interface CardData {
   tail: string
   tags: { label: string; value: string; imprecise: boolean }[]
   profile: string
-  incomeText: string | null
   source: string
 }
 
@@ -164,10 +163,6 @@ function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
     by -= 60
   }
   ctx.font = `700 44px ${TEXT}`
-  if (d.incomeText) {
-    ctx.fillText(d.incomeText, M, by)
-    by -= 64
-  }
   ctx.fillText(d.profile, M, by)
 }
 
@@ -188,18 +183,19 @@ export async function renderCardBlob(data: CardData): Promise<Blob> {
   )
 }
 
-export interface CardCache { get(showIncome: boolean): Promise<Blob> }
+export interface CardCache { get(): Promise<Blob> }
 
 // Pre-renders the card so the share click can call navigator.share while user activation is still valid.
-export function createCardCache(render: (showIncome: boolean) => Promise<Blob>): CardCache {
-  const cache = new Map<boolean, Promise<Blob>>()
+export function createCardCache(render: () => Promise<Blob>): CardCache {
+  let pending: Promise<Blob> | null = null
   return {
-    get(showIncome) {
-      let pending = cache.get(showIncome)
+    get() {
       if (!pending) {
-        pending = render(showIncome)
-        pending.catch(() => cache.delete(showIncome))
-        cache.set(showIncome, pending)
+        const current = render()
+        current.catch(() => {
+          if (pending === current) pending = null
+        })
+        pending = current
       }
       return pending
     },
