@@ -25,14 +25,18 @@ async function main(): Promise<void> {
   const ds = dataset
   renderFooter(document.getElementById('footer')!, ds.meta)
 
+  // The form and the result are never shown together: submitting swaps to the result, "Refazer" swaps back.
   const form = renderForm(formRoot, (input) => {
     renderResult(resultRoot, { input, results: computeResults(ds, input), meta: ds.meta }, {
       onReset: () => {
+        formRoot.hidden = false
+        window.scrollTo({ top: 0 })
         form.reset()
-        formRoot.scrollIntoView({ behavior: 'smooth' })
       },
     })
-    resultRoot.scrollIntoView({ behavior: 'smooth' })
+    formRoot.hidden = true
+    window.scrollTo({ top: 0 })
+    resultRoot.querySelector<HTMLElement>('.hero')?.focus()
   })
 }
 
