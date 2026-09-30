@@ -13,9 +13,9 @@
 @keyframes sheet-up { from { transform: translateY(100%); } }
 @keyframes sheet-left { from { transform: translateX(100%); } }
 .sheet__close { position: absolute; top: 10px; right: 12px; border: 0; background: var(--white); border-radius: 50%; width: 40px; height: 40px; font: 400 26px/1 system-ui, sans-serif; box-shadow: var(--shadow-tag); }
-.sheet__eyebrow { text-transform: uppercase; letter-spacing: 0.06em; font-size: 16px; margin: 0 48px 6px 0; }
-.sheet__title { font-weight: 400; font-size: 26px; line-height: 1.1; margin: 0 0 14px; }
-.sheet__title b { color: var(--red); font-weight: 900; }
+.sheet__eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; font-weight: 800; margin: 0 48px 6px 0; }
+.sheet__title { font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1.2; margin: 0 0 14px; }
+.sheet__title b { color: var(--red); font-weight: 400; }
 .curve { margin: 0 0 16px; background: var(--white); border-radius: 6px; padding: 12px 8px 4px; box-shadow: var(--shadow-tag); }
 .curve__svg { width: 100%; height: auto; display: block; overflow: visible; }
 .curve__area { fill: var(--ink); opacity: 0.12; }
@@ -24,11 +24,11 @@
 .curve__median { stroke: var(--ink); stroke-dasharray: 3 3; }
 .curve__marker { stroke: var(--red); stroke-width: 3; }
 .curve__axis { stroke: var(--ink); }
-.curve__tick, .curve__label { font: 400 11px var(--font); fill: var(--ink); }
-.curve__you { font: 900 13px var(--font); fill: var(--red); text-transform: uppercase; }
+.curve__tick, .curve__label { font: 700 11px var(--font-text); fill: var(--ink); }
+.curve__you { font: 400 14px var(--font-display); fill: var(--red); }
 .refs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 14px; }
 .refs__item { background: var(--white); border-radius: 6px; padding: 8px; box-shadow: var(--shadow-tag); }
-.refs dt { font-size: 13px; text-transform: uppercase; }
-.refs dd { margin: 2px 0 0; font-weight: 900; font-size: 20px; color: var(--red); }
-.sheet__context { font-size: 18px; margin: 0 0 10px; }
+.refs dt { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.refs dd { margin: 4px 0 0; font-family: var(--font-display); font-size: 18px; color: var(--red); }
+.sheet__context { font-size: 17px; font-weight: 700; margin: 0 0 10px; }
 .sheet__warn { background: var(--ink); color: var(--paper); padding: 8px 10px; border-radius: 4px; font-size: 15px; margin: 0; }

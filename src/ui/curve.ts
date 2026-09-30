@@ -18,6 +18,9 @@ const TICKS = [
   { value: 100000, label: 'R$ 100 mil' },
 ]
 
+// Minimum horizontal distance between tick labels, in viewBox units.
+const MIN_TICK_GAP = 48
+
 export function curveGeometry(
   points: { x: number; y: number }[],
   income: number,
@@ -33,10 +36,13 @@ export function curveGeometry(
   const coords = points.map((p) => `${sx(p.x).toFixed(1)},${sy(p.y).toFixed(1)}`)
   const line = `M0,${sy(points[0].y).toFixed(1)} L${coords.join(' L')} L${width},${sy(points[points.length - 1].y).toFixed(1)}`
   const area = `M0,${height} L0,${sy(points[0].y).toFixed(1)} L${coords.join(' L')} L${width},${height} Z`
-  const ticks = TICKS.filter((t) => t.value >= points[0].x && t.value <= points[points.length - 1].x).map((t) => ({
-    x: sx(t.value),
-    label: t.label,
-  }))
+  const ticks: { x: number; label: string }[] = []
+  for (const t of TICKS) {
+    if (t.value < points[0].x || t.value > points[points.length - 1].x) continue
+    const x = sx(t.value)
+    if (ticks.length > 0 && x - ticks[ticks.length - 1].x < MIN_TICK_GAP) continue
+    ticks.push({ x, label: t.label })
+  }
   return { area, line, markerX: sx(income), medianX: sx(median), ticks }
 }
 
