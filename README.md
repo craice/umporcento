@@ -16,7 +16,7 @@ Nenhum dado sai do seu navegador. O cálculo acontece no seu aparelho, a partir 
 - **Recortes:** Brasil, UF, faixa etária (18–24, 25–34, 35–44, 45–54, 55–64, 65+), faixa etária × UF e posição na ocupação (`VD4009`).
 - **Percentis:** p1 a p99 e p99,1 a p99,9 por recorte. A posição da pessoa é interpolada entre percentis vizinhos.
 - **Renda anual:** dividida por 13,33 para posições com carteira ou servidor estatutário e por 12 nas demais.
-- **Correção monetária:** IPCA (série 433 do Banco Central) acumulado de julho do ano dos dados até o último mês disponível na geração.
+- **Correção monetária:** IPCA (série 433 do Banco Central) acumulado de julho do ano dos dados até o último mês disponível na geração. A faixa de quem ganha exatamente o salário mínimo é levada ao salário mínimo atual.
 - **Validação:** a renda média por UF calculada pelo pipeline é comparada com a tabela 4660 do SIDRA/IBGE. Diferenças acima de 2% interrompem a geração.
 - **Limitações:** pesquisas domiciliares subestimam rendas muito altas. Recortes com menos de 100 pessoas na amostra são marcados como "estimativa imprecisa".
 
@@ -44,6 +44,8 @@ python -m pipeline.build --year 2024
 ```
 
 Depois, faça commit do JSON gerado. O deploy não roda o pipeline.
+
+**Todo mês de janeiro**, adicione o novo salário mínimo em `MIN_WAGE` (`src/config.ts`). Na correção pelo IPCA, quem ganhava exatamente o mínimo do ano dos dados passa a valer o mínimo atual, porque o mínimo é reajustado por lei e não pelo IPCA.
 
 ## Deploy
 
