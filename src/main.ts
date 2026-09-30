@@ -7,6 +7,7 @@ import './styles/sheet.css'
 import { computeResults, loadDataset } from './data'
 import { renderForm } from './ui/form'
 import { renderResult } from './ui/result'
+import { renderFooter } from './ui/footer'
 
 async function main(): Promise<void> {
   const formRoot = document.getElementById('form')!
@@ -20,6 +21,7 @@ async function main(): Promise<void> {
     return
   }
   const ds = dataset
+  renderFooter(document.getElementById('footer')!, ds.meta)
 
   const form = renderForm(formRoot, (input) => {
     renderResult(resultRoot, { input, results: computeResults(ds, input), meta: ds.meta }, {

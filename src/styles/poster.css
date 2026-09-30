@@ -72,3 +72,9 @@ select { width: 100%; background: var(--white); border: 0; border-radius: 6px; b
 .share-status { margin: 0; font-size: 16px; min-height: 0; }
 .share-status:empty { display: none; }
 .linkish { border: 0; background: none; padding: 0; text-decoration: underline; font-weight: 900; }
+
+.footer { font-size: 16px; line-height: 1.35; }
+.footer a { color: inherit; }
+.footer__small { font-size: 14px; opacity: 0.8; }
+.method { background: var(--white); border-radius: 6px; padding: 10px 12px; box-shadow: var(--shadow-tag); margin: 12px 0; }
+.method summary { font-weight: 900; text-transform: uppercase; cursor: pointer; }
