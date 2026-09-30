@@ -2,6 +2,11 @@ import { formatBRL, headline, valueAt } from '../calc'
 import type { ScopeResult } from '../data'
 import { renderCurveSvg } from './curve'
 
+export function detailCaption(rank: number, audience: string, median: number): string {
+  const h = headline(rank)
+  return `Distribuição de renda ${audience}. A mediana é ${formatBRL(median)}. ${h.lead} ${h.num}% dessas pessoas.`
+}
+
 let lastFocus: HTMLElement | null = null
 
 function close(root: HTMLElement, onKey: (e: KeyboardEvent) => void): void {
@@ -32,7 +37,7 @@ export function openDetail(scope: ScopeResult, income: number): void {
       <h2 id="sheet-title" class="sheet__title">${h.lead} <b>${h.num}%</b> ${scope.audience}.</h2>
       <figure class="curve">
         ${renderCurveSvg(scope, income)}
-        <figcaption class="sr-only">Distribuição de renda ${scope.audience}. A mediana é ${formatBRL(median)}. Sua renda fica acima de ${h.num}% dessas pessoas.</figcaption>
+        <figcaption class="sr-only">${detailCaption(scope.rank, scope.audience, median)}</figcaption>
       </figure>
       <dl class="refs">
         <div class="refs__item"><dt>Mediana</dt><dd>${formatBRL(median)}</dd></div>

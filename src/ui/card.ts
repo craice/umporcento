@@ -162,6 +162,24 @@ export async function renderCardBlob(data: CardData): Promise<Blob> {
   )
 }
 
+export interface CardCache { get(showIncome: boolean): Promise<Blob> }
+
+// Pre-renders the card so the share click can call navigator.share while user activation is still valid.
+export function createCardCache(render: (showIncome: boolean) => Promise<Blob>): CardCache {
+  const cache = new Map<boolean, Promise<Blob>>()
+  return {
+    get(showIncome) {
+      let pending = cache.get(showIncome)
+      if (!pending) {
+        pending = render(showIncome)
+        pending.catch(() => cache.delete(showIncome))
+        cache.set(showIncome, pending)
+      }
+      return pending
+    },
+  }
+}
+
 export async function shareOrDownload(blob: Blob, env: ShareEnv): Promise<ShareOutcome> {
   const file = new File([blob], FILENAME, { type: 'image/png' })
   const data: ShareData = { files: [file], text: `Onde você está na renda do Brasil? ${SITE_URL}` }

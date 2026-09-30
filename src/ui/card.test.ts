@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { shareOrDownload, wrapWords, type ShareEnv } from './card'
+import { createCardCache, shareOrDownload, wrapWords, type ShareEnv } from './card'
 
 const blob = new Blob(['x'], { type: 'image/png' })
 
@@ -43,5 +43,26 @@ describe('wrapWords', () => {
   })
   it('keeps a single long word on its own line', () => {
     expect(wrapWords('extraordinariamente', measure, 50)).toEqual(['extraordinariamente'])
+  })
+})
+
+describe('createCardCache', () => {
+  it('renders once per variant so the share click does not wait for drawing', async () => {
+    const render = vi.fn(async (showIncome: boolean) => new Blob([String(showIncome)]))
+    const cache = createCardCache(render)
+    const a = cache.get(false)
+    expect(cache.get(false)).toBe(a)
+    await cache.get(true)
+    expect(render).toHaveBeenCalledTimes(2)
+  })
+  it('retries after a failed render', async () => {
+    let calls = 0
+    const cache = createCardCache(async () => {
+      calls++
+      if (calls === 1) throw new Error('boom')
+      return new Blob(['ok'])
+    })
+    await expect(cache.get(false)).rejects.toThrow('boom')
+    await expect(cache.get(false)).resolves.toBeInstanceOf(Blob)
   })
 })

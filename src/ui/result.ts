@@ -1,7 +1,7 @@
 import { formatBRL, formatPercent, headline } from '../calc'
 import type { Meta, ScopeResult, UserInput } from '../data'
 import { profileLine } from '../data'
-import { browserShareEnv, renderCardBlob, shareOrDownload, type CardData } from './card'
+import { browserShareEnv, createCardCache, renderCardBlob, shareOrDownload, type CardData } from './card'
 import { openDetail } from './detail'
 import { SITE_URL } from '../config'
 
@@ -73,12 +73,15 @@ export function renderResult(
 
   const status = root.querySelector<HTMLElement>('.share-status')!
   const shareBtn = root.querySelector<HTMLButtonElement>('[data-action="share"]')!
+  const incomeToggle = root.querySelector<HTMLInputElement>('[data-show-income]')!
+  const cards = createCardCache((showIncome) => renderCardBlob(cardData(input, results, meta, showIncome)))
+  cards.get(false).catch(() => {})
+  incomeToggle.addEventListener('change', () => cards.get(incomeToggle.checked).catch(() => {}))
   shareBtn.addEventListener('click', async () => {
     shareBtn.disabled = true
     status.textContent = 'Gerando cartaz…'
     try {
-      const showIncome = root.querySelector<HTMLInputElement>('[data-show-income]')!.checked
-      const blob = await renderCardBlob(cardData(input, results, meta, showIncome))
+      const blob = await cards.get(incomeToggle.checked)
       const outcome = await shareOrDownload(blob, browserShareEnv())
       if (outcome === 'downloaded') {
         status.innerHTML = 'Cartaz baixado. <button type="button" class="linkish" data-copy>Copiar link do site</button>'

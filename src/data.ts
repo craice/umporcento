@@ -1,5 +1,5 @@
-import { adjust, percentileRank } from './calc'
-import { DATA_URL, MIN_SAMPLE_SIZE } from './config'
+import { percentileRank } from './calc'
+import { DATA_URL, MIN_SAMPLE_SIZE, MIN_WAGE } from './config'
 import {
   SCOPE_ORDER, findAge, findPosition, findUf, groupKeys,
   type AgeBand, type PositionCode, type ScopeId,
@@ -37,6 +37,27 @@ export interface ScopeResult {
   values: number[]
 }
 
+export interface MinWageShift { from: number; to: number }
+
+export function minWageShift(meta: Pick<Meta, 'year' | 'ipca_ref'>): MinWageShift | undefined {
+  if (!meta.ipca_ref) return undefined
+  const from = MIN_WAGE[meta.year]
+  const to = MIN_WAGE[Number(meta.ipca_ref.slice(0, 4))]
+  if (!from || !to || from === to) return undefined
+  return { from, to }
+}
+
+// Brings percentile values forward by IPCA, except the data-year minimum wage, which moves to the
+// current minimum wage (it is legally indexed, not IPCA-indexed). Keeps the sequence non-decreasing.
+export function adjustValues(p: readonly number[], factor: number, shift?: MinWageShift): number[] {
+  let floor = -Infinity
+  return p.map((v) => {
+    const adjusted = shift && v === shift.from ? shift.to : v * factor
+    floor = Math.max(floor, adjusted)
+    return floor
+  })
+}
+
 export async function loadDataset(url: string = DATA_URL, fetchFn: typeof fetch = fetch): Promise<Dataset> {
   const response = await fetchFn(url)
   if (!response.ok) throw new Error(`Failed to load dataset: HTTP ${response.status}`)
@@ -64,6 +85,7 @@ function describeScope(id: ScopeId, input: UserInput): { label: string; audience
 export function computeResults(ds: Dataset, input: UserInput): ScopeResult[] {
   const keys = groupKeys(input.uf, input.age, input.position)
   const levels = ds.meta.percentiles
+  const shift = minWageShift(ds.meta)
   return SCOPE_ORDER.map((id) => {
     const key = keys[id]
     const group = ds.groups[key]
@@ -71,7 +93,7 @@ export function computeResults(ds: Dataset, input: UserInput): ScopeResult[] {
     if (!group) {
       return { id, key, label, audience, rank: null, imprecise: true, n: 0, levels, values: [] }
     }
-    const values = adjust(group.p, ds.meta.ipca_factor)
+    const values = adjustValues(group.p, ds.meta.ipca_factor, shift)
     return {
       id, key, label, audience,
       rank: percentileRank(input.monthlyIncome, levels, values),

@@ -28,11 +28,20 @@ def test_parse_sidra_skips_header_and_maps_codes():
 
 
 def test_compare_flags_out_of_tolerance_and_missing():
-    errors = compare({"SP": 4300.0, "BA": 2100.0}, {"SP": 4183.0, "BA": 2101.0, "RJ": 3900.0})
+    errors = compare({"SP": 4300.0, "BA": 2100.0}, {"SP": 4183.0, "BA": 2101.0, "RJ": 3900.0}, min_ufs=3)
     assert len(errors) == 2
     assert any("SP" in e for e in errors)
     assert any("RJ" in e for e in errors)
 
 
 def test_compare_ok_within_tolerance():
-    assert compare({"SP": 4200.0}, {"SP": 4183.0}) == []
+    assert compare({"SP": 4200.0}, {"SP": 4183.0}, min_ufs=1) == []
+
+
+def test_compare_fails_when_official_data_is_incomplete():
+    errors = compare({"SP": 4183.0}, {"SP": 4183.0})
+    assert errors and "official" in errors[0]
+
+
+def test_compare_fails_when_official_data_is_empty():
+    assert compare({"SP": 4183.0}, {}) != []

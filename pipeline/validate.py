@@ -31,8 +31,13 @@ def official_means(year: int) -> dict[str, float]:
 
 
 def compare(
-    computed: dict[str, float], official: dict[str, float], tolerance: float = 0.02
+    computed: dict[str, float],
+    official: dict[str, float],
+    tolerance: float = 0.02,
+    min_ufs: int = len(UF_CODES),
 ) -> list[str]:
+    if len(official) < min_ufs:
+        return [f"official data incomplete: {len(official)} of {min_ufs} UFs published"]
     errors: list[str] = []
     for sigla, expected in sorted(official.items()):
         got = computed.get(sigla)
