@@ -1,0 +1,11 @@
+:root {
+  --paper: #ffe600;
+  --red: #e8001c;
+  --ink: #141414;
+  --white: #ffffff;
+  --shadow-tag: 2px 3px 0 rgba(0, 0, 0, 0.18);
+  --font: 'Londrina Solid', 'Arial Narrow', sans-serif;
+  --column: 480px;
+  --gutter: 16px;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+}

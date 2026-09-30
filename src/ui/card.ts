@@ -1,0 +1,213 @@
+import { SITE_LABEL, SITE_URL } from '../config'
+
+export interface CardData {
+  lead: string
+  num: string
+  tail: string
+  tags: { label: string; value: string; imprecise: boolean }[]
+  profile: string
+  incomeText: string | null
+  source: string
+}
+
+export interface ShareEnv {
+  canShare?: (data: ShareData) => boolean
+  share?: (data: ShareData) => Promise<void>
+  download: (blob: Blob, filename: string) => void
+}
+
+export type ShareOutcome = 'shared' | 'cancelled' | 'downloaded'
+
+const FILENAME = 'umporcento.png'
+const W = 1080
+const H = 1920
+const PAPER = '#FFE600'
+const RED = '#E8001C'
+const INK = '#141414'
+const FONT = '"Londrina Solid"'
+
+export function wrapWords(text: string, measure: (s: string) => number, maxWidth: number): string[] {
+  const lines: string[] = []
+  let current = ''
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const candidate = current ? `${current} ${word}` : word
+    if (current && measure(candidate) > maxWidth) {
+      lines.push(current)
+      current = word
+    } else {
+      current = candidate
+    }
+  }
+  if (current) lines.push(current)
+  return lines
+}
+
+function grain(ctx: CanvasRenderingContext2D): void {
+  let seed = 42
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+  ctx.fillStyle = 'rgba(0,0,0,0.05)'
+  for (let i = 0; i < 9000; i++) ctx.fillRect(rand() * W, rand() * H, 2, 2)
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.arcTo(x + w, y, x + w, y + h, r)
+  ctx.arcTo(x + w, y + h, x, y + h, r)
+  ctx.arcTo(x, y + h, x, y, r)
+  ctx.arcTo(x, y, x + w, y, r)
+  ctx.closePath()
+}
+
+function draw(ctx: CanvasRenderingContext2D, d: CardData): void {
+  const M = 80
+  ctx.fillStyle = PAPER
+  ctx.fillRect(0, 0, W, H)
+  grain(ctx)
+  ctx.textBaseline = 'alphabetic'
+
+  // top row
+  ctx.fillStyle = INK
+  ctx.font = `400 48px ${FONT}`
+  ctx.fillText('UMPORCENTO', M, 140)
+  ctx.font = `900 44px ${FONT}`
+  const stamp = 'PNAD · IBGE'
+  const sw = ctx.measureText(stamp).width + 40
+  ctx.fillStyle = RED
+  roundRect(ctx, W - M - sw, 92, sw, 66, 8)
+  ctx.fill()
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillText(stamp, W - M - sw + 20, 142)
+
+  // lead
+  ctx.fillStyle = INK
+  ctx.font = `900 96px ${FONT}`
+  let y = 300
+  for (const line of wrapWords(d.lead.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
+    ctx.fillText(line, M, y)
+    y += 92
+  }
+
+  // number
+  ctx.fillStyle = RED
+  ctx.font = `900 440px ${FONT}`
+  const numY = y + 330
+  ctx.fillText(d.num, M - 10, numY)
+  const nw = ctx.measureText(d.num).width
+  ctx.font = `900 200px ${FONT}`
+  ctx.fillText('%', M - 10 + nw + 10, numY - 190)
+
+  // tail
+  ctx.fillStyle = INK
+  ctx.font = `900 80px ${FONT}`
+  y = numY + 100
+  for (const line of wrapWords(d.tail.toUpperCase(), (s) => ctx.measureText(s).width, W - 2 * M)) {
+    ctx.fillText(line, M, y)
+    y += 80
+  }
+
+  // tags 2x2
+  const gap = 28
+  const tw = (W - 2 * M - gap) / 2
+  const th = 210
+  y += 30
+  d.tags.slice(0, 4).forEach((tag, i) => {
+    const x = M + (i % 2) * (tw + gap)
+    const ty = y + Math.floor(i / 2) * (th + gap)
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'
+    roundRect(ctx, x + 8, ty + 10, tw, th, 18)
+    ctx.fill()
+    ctx.fillStyle = '#FFFFFF'
+    roundRect(ctx, x, ty, tw, th, 18)
+    ctx.fill()
+    ctx.fillStyle = INK
+    ctx.font = `400 44px ${FONT}`
+    ctx.fillText(tag.label.toUpperCase(), x + 28, ty + 66)
+    ctx.fillStyle = RED
+    ctx.font = `900 120px ${FONT}`
+    ctx.fillText(tag.value + (tag.imprecise ? '*' : ''), x + 28, ty + 182)
+  })
+
+  // bottom block, anchored to the bottom edge so it never collides with the tags
+  ctx.fillStyle = INK
+  ctx.font = `900 56px ${FONT}`
+  ctx.fillText(SITE_LABEL, M, H - 130)
+  ctx.font = `400 40px ${FONT}`
+  ctx.fillText(d.source, M, H - 76)
+
+  let by = H - 230
+  if (d.tags.some((t) => t.imprecise)) {
+    ctx.font = `400 36px ${FONT}`
+    ctx.fillText('* estimativa imprecisa (amostra pequena)', M, by)
+    by -= 60
+  }
+  ctx.font = `400 48px ${FONT}`
+  if (d.incomeText) {
+    ctx.fillText(d.incomeText, M, by)
+    by -= 64
+  }
+  ctx.fillText(d.profile, M, by)
+}
+
+export async function renderCardBlob(data: CardData): Promise<Blob> {
+  await Promise.all([document.fonts.load(`400 48px ${FONT}`), document.fonts.load(`900 120px ${FONT}`)])
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas 2D not available')
+  draw(ctx, data)
+  return new Promise((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png'),
+  )
+}
+
+export interface CardCache { get(showIncome: boolean): Promise<Blob> }
+
+// Pre-renders the card so the share click can call navigator.share while user activation is still valid.
+export function createCardCache(render: (showIncome: boolean) => Promise<Blob>): CardCache {
+  const cache = new Map<boolean, Promise<Blob>>()
+  return {
+    get(showIncome) {
+      let pending = cache.get(showIncome)
+      if (!pending) {
+        pending = render(showIncome)
+        pending.catch(() => cache.delete(showIncome))
+        cache.set(showIncome, pending)
+      }
+      return pending
+    },
+  }
+}
+
+export async function shareOrDownload(blob: Blob, env: ShareEnv): Promise<ShareOutcome> {
+  const file = new File([blob], FILENAME, { type: 'image/png' })
+  const data: ShareData = { files: [file], text: `Onde você está na renda do Brasil? ${SITE_URL}` }
+  if (env.share && env.canShare?.(data)) {
+    try {
+      await env.share(data)
+      return 'shared'
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') return 'cancelled'
+    }
+  }
+  env.download(blob, FILENAME)
+  return 'downloaded'
+}
+
+export function browserShareEnv(): ShareEnv {
+  return {
+    canShare: navigator.canShare?.bind(navigator),
+    share: navigator.share?.bind(navigator),
+    download(blob, filename) {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    },
+  }
+}

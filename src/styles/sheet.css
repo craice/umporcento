@@ -1,0 +1,34 @@
+.has-sheet { overflow: hidden; }
+.sheet-root { position: fixed; inset: 0; z-index: 10; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(20, 20, 20, 0.55); }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  max-height: 88vh; overflow-y: auto;
+  background: var(--paper); border-radius: 14px 14px 0 0;
+  padding: 22px 18px 28px; animation: sheet-up 0.22s ease-out;
+}
+@media (min-width: 760px) {
+  .sheet { left: auto; top: 0; width: 440px; max-height: none; border-radius: 0; animation-name: sheet-left; }
+}
+@keyframes sheet-up { from { transform: translateY(100%); } }
+@keyframes sheet-left { from { transform: translateX(100%); } }
+.sheet__close { position: absolute; top: 10px; right: 12px; border: 0; background: var(--white); border-radius: 50%; width: 40px; height: 40px; font: 400 26px/1 system-ui, sans-serif; box-shadow: var(--shadow-tag); }
+.sheet__eyebrow { text-transform: uppercase; letter-spacing: 0.06em; font-size: 16px; margin: 0 48px 6px 0; }
+.sheet__title { font-weight: 400; font-size: 26px; line-height: 1.1; margin: 0 0 14px; }
+.sheet__title b { color: var(--red); font-weight: 900; }
+.curve { margin: 0 0 16px; background: var(--white); border-radius: 6px; padding: 12px 8px 4px; box-shadow: var(--shadow-tag); }
+.curve__svg { width: 100%; height: auto; display: block; overflow: visible; }
+.curve__area { fill: var(--ink); opacity: 0.12; }
+.curve__area--below { fill: var(--red); opacity: 0.85; }
+.curve__line { fill: none; stroke: var(--ink); stroke-width: 2; }
+.curve__median { stroke: var(--ink); stroke-dasharray: 3 3; }
+.curve__marker { stroke: var(--red); stroke-width: 3; }
+.curve__axis { stroke: var(--ink); }
+.curve__tick, .curve__label { font: 400 11px var(--font); fill: var(--ink); }
+.curve__you { font: 900 13px var(--font); fill: var(--red); text-transform: uppercase; }
+.refs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 14px; }
+.refs__item { background: var(--white); border-radius: 6px; padding: 8px; box-shadow: var(--shadow-tag); }
+.refs dt { font-size: 13px; text-transform: uppercase; }
+.refs dd { margin: 2px 0 0; font-weight: 900; font-size: 20px; color: var(--red); }
+.sheet__context { font-size: 18px; margin: 0 0 10px; }
+.sheet__warn { background: var(--ink); color: var(--paper); padding: 8px 10px; border-radius: 4px; font-size: 15px; margin: 0; }

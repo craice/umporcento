@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>umporcento — onde você está na renda do Brasil</title>
+    <meta name="description" content="Descubra em que posição sua renda do trabalho está no Brasil, no seu estado e na sua faixa de idade. Dados da PNAD Contínua/IBGE. Nada sai do seu navegador." />
+    <meta property="og:title" content="umporcento — onde você está na renda do Brasil" />
+    <meta property="og:description" content="Compare sua renda com a de quem trabalha no Brasil. Dados do IBGE, sem guardar nada." />
+    <meta property="og:image" content="https://craice.github.io/umporcento/og.png" />
+    <meta property="og:url" content="https://craice.github.io/umporcento/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#FFE600" />
+  </head>
+  <body>
+    <main class="page">
+      <section id="form" aria-label="Seus dados"></section>
+      <section id="result" aria-live="polite"></section>
+    </main>
+    <footer id="footer" class="page"></footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

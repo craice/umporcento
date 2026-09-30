@@ -1,0 +1,16 @@
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: #d9d6cf;
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 400;
+  line-height: 1.2;
+}
+.page { max-width: calc(var(--column) + 2 * var(--gutter)); margin: 0 auto; padding: 24px var(--gutter); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
