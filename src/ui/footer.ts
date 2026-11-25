@@ -24,5 +24,6 @@ export function renderFooter(root: HTMLElement, meta: Meta): void {
     </details>
     <p class="footer__small">Como qualquer site, a hospedagem (GitHub Pages) registra acessos em seus servidores. O umporcento não recebe nem guarda nenhum dado.</p>
     <p class="footer__small">Código aberto: <a href="${REPO_URL}" rel="noopener">${REPO_URL.replace('https://', '')}</a></p>
+    <p class="footer__small">Feito por <a href="https://craice.me" rel="noopener">Rafael Craice</a>.</p>
   </div>`
 }

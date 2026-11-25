@@ -51,6 +51,10 @@ Depois, faça commit do JSON gerado. O deploy não roda o pipeline.
 
 Todo push na `main` roda os testes e publica no GitHub Pages (`.github/workflows/deploy.yml`).
 
+## Autor
+
+Feito por [Rafael Craice](https://craice.me).
+
 ## Licença
 
 Código sob licença MIT. Os microdados da PNAD Contínua são públicos e produzidos pelo IBGE. As fontes Carter One e Nunito são distribuídas sob a SIL Open Font License.
